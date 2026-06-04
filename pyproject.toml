@@ -1,0 +1,9 @@
+[project]
+name = "charts"
+version = "0.1.0"
+description = "Python project that is reponsible for creating charts about the simulated game"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.10.9",
+    "numpy>=2.2.6",
+]
