@@ -12,7 +12,9 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 
 ## Architecture
 
-- `src/constants/index.ts` — only `BALL_RADIUS`; ball visual configs (`BallConfig` + `BALLS_CONFIG`) live in `balls-group.tsx`
+- `src/constants/index.ts` — presentation-only constants (only `BALL_RADIUS`). Ball visual configs (`BallConfig` + `BALLS_CONFIG`) live in `balls-group.tsx`
+- `src/stores/physics-store.ts` — zustand store bridging physics → presentation: `BallState` (position, velocity, angularVelocity) per ball (0=cue, 1–15=rack), plus `cuePosition`. Actions: `setBallState`, `setCuePosition`, `reset`
+- `src/physics/` — simulation engine (equations, collision detection, motion integration). Physics own constants live here, separate from presentation constants
 - `src/models/` — individual 3D components
 - `src/groups/` — composed scene objects
 - `src/app.tsx` — root: Canvas, lighting, scene assembly
