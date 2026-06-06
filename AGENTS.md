@@ -1,17 +1,30 @@
-# Preview about project
+# Pool Simulation
 
-This is a project for creating simulation for billiard game, this project uses react + vite + typescript as stack,
-also for 3d modeling we are using those packages `three`, `@react-three/drei` and `@react-three/fiber`
+Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@react-three/drei`.
 
-## Project structure
-This project main focus is inside `src/` folder, inside it you will find:
-- `app.tsx` as the main component for the app
-- `main.tsx` the initialization for the project as any react project
-- `main.css` some styling (probably you won't touch)
-- `constants/` includes main constants
-- `groups/` includes the components of 3d models as groups
-- `models/` includes the components of 3d models as individuals
+## Commands
 
-## Your role
-You would help achieving accurate simulating for this project for billiard game, also build great experience in this
-project
+| Command | What it does |
+|---------|-------------|
+| `bun dev` | Dev server with HMR |
+| `bun build` | `tsc -b && vite build` — run both **before considering PR-ready** |
+| `bun lint` | ESLint on `.` |
+
+## Architecture
+
+- `src/constants/index.ts` — shared constants
+- `src/models/` — individual 3D components
+- `src/groups/` — composed scene objects
+- `src/app.tsx` — root: Canvas, lighting, scene assembly
+
+## Scene layout
+
+- Table group at `y=-0.5`, felt surface at world `y=-0.44` (`-0.5 + 0.05 + 0.01`)
+- Balls group at `y=-0.44`; cue ball at `[-1.0, BALL_RADIUS, 0]` local → `[-1.0, -0.40, 0]` world
+- Cue built along local Y axis, rotated `[0, 0, -PI/2]` to lie in XZ plane (tip at +Y → +X toward table)
+
+## Conventions
+
+- 3D components use `group` wrappers, accept `position`/`rotation` props when reusable
+- Use `meshStandardMaterial` (roughness, metalness, envMapIntensity) — see `Ball.tsx` for reference
+- TypeScript: `noUnusedLocals`, `noUnusedParameters`, `verbatimModuleSyntax`, `erasableSyntaxOnly` — unused imports/exports are errors

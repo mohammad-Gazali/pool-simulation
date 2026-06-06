@@ -1,5 +1,5 @@
 const TABLE_WIDTH = 2.74;
-const TABLE_HIEGHT = 1.37;
+const TABLE_HEIGHT = 1.37;
 const TABLE_THICKNESS = 0.1;
 const TABLE_COLOR = "#3a2818";
 
@@ -16,10 +16,10 @@ export const BilliardTable = () => {
   const thickness = 0.01;
 
   const pocketPositions: [number, number][] = [
-    [-TABLE_WIDTH / 2, -TABLE_HIEGHT / 2],
-    [TABLE_WIDTH / 2, -TABLE_HIEGHT / 2],
-    [-TABLE_WIDTH / 2, TABLE_HIEGHT / 2],
-    [TABLE_WIDTH / 2, TABLE_HIEGHT / 2],
+    [-TABLE_WIDTH / 2, -TABLE_HEIGHT / 2],
+    [TABLE_WIDTH / 2, -TABLE_HEIGHT / 2],
+    [-TABLE_WIDTH / 2, TABLE_HEIGHT / 2],
+    [TABLE_WIDTH / 2, TABLE_HEIGHT / 2],
     [-TABLE_WIDTH / 2, 0],
     [TABLE_WIDTH / 2, 0],
   ];
@@ -32,7 +32,7 @@ export const BilliardTable = () => {
           args={[
             TABLE_WIDTH + CORNER_THICKNESS,
             TABLE_THICKNESS,
-            TABLE_HIEGHT + CORNER_THICKNESS,
+            TABLE_HEIGHT + CORNER_THICKNESS,
           ]}
         />
         <meshStandardMaterial color={TABLE_COLOR} roughness={0} />
@@ -46,7 +46,7 @@ export const BilliardTable = () => {
             position={[
               x * (TABLE_WIDTH / 2 + 0.1),
               -0.4,
-              z * (TABLE_HIEGHT / 2 + 0.1),
+              z * (TABLE_HEIGHT / 2 + 0.1),
             ]}
             castShadow
             receiveShadow
@@ -63,7 +63,7 @@ export const BilliardTable = () => {
           args={[
             TABLE_WIDTH - 2 * CUSHION_WIDTH,
             FELT_THICKNESS,
-            TABLE_HIEGHT - 2 * CUSHION_WIDTH,
+            TABLE_HEIGHT - 2 * CUSHION_WIDTH,
           ]}
         />
         <meshStandardMaterial color={FELT_COLOR} roughness={0.9} />
@@ -71,7 +71,7 @@ export const BilliardTable = () => {
 
       {/* Cushions / Rails */}
       <mesh
-        position={[0, CUSHION_HEIGHT / 2, TABLE_HIEGHT / 2 - CUSHION_WIDTH / 2]}
+        position={[0, CUSHION_HEIGHT / 2, TABLE_HEIGHT / 2 - CUSHION_WIDTH / 2]}
         castShadow
         receiveShadow
       >
@@ -82,7 +82,7 @@ export const BilliardTable = () => {
         position={[
           0,
           CUSHION_HEIGHT / 2,
-          -TABLE_HIEGHT / 2 + CUSHION_WIDTH / 2,
+          -TABLE_HEIGHT / 2 + CUSHION_WIDTH / 2,
         ]}
         castShadow
         receiveShadow
@@ -95,7 +95,7 @@ export const BilliardTable = () => {
         castShadow
         receiveShadow
       >
-        <boxGeometry args={[CUSHION_WIDTH, CUSHION_HEIGHT, TABLE_HIEGHT]} />
+        <boxGeometry args={[CUSHION_WIDTH, CUSHION_HEIGHT, TABLE_HEIGHT]} />
         <meshStandardMaterial color={CUSHION_COLOR} />
       </mesh>
       <mesh
@@ -103,7 +103,7 @@ export const BilliardTable = () => {
         castShadow
         receiveShadow
       >
-        <boxGeometry args={[CUSHION_WIDTH, CUSHION_HEIGHT, TABLE_HIEGHT]} />
+        <boxGeometry args={[CUSHION_WIDTH, CUSHION_HEIGHT, TABLE_HEIGHT]} />
         <meshStandardMaterial color={CUSHION_COLOR} />
       </mesh>
 
