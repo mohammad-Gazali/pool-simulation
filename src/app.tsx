@@ -3,6 +3,7 @@ import { Environment, OrbitControls } from "@react-three/drei";
 import { BilliardTable } from "./models/billiard-table";
 import { BallsGroup } from "./groups/balls-group";
 import { Suspense } from "react";
+import { Cue } from "./models/cue";
 
 export const App = () => {
   return (
@@ -39,6 +40,7 @@ export const App = () => {
 
           <BilliardTable />
           <BallsGroup />
+          <Cue />
           <OrbitControls
             makeDefault
             minPolarAngle={0.2}
