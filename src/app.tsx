@@ -1,13 +1,18 @@
-import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
-import { BilliardTable } from "./models/billiard-table";
-import { BallsGroup } from "./groups/balls-group";
-import { Suspense } from "react";
-import { Cue } from "./models/cue";
+import { useState, Suspense } from "react"
+import { Canvas } from "@react-three/fiber"
+import { Environment, OrbitControls } from "@react-three/drei"
+import { BilliardTable } from "./models/billiard-table"
+import { BallsGroup } from "./groups/balls-group"
+import { CueControl } from "./groups/cue-control"
+import { GameHud } from "./components/game-hud"
 
 export const App = () => {
+  const [power, setPower] = useState(0.3)
+  const [contactOffset, setContactOffset] = useState<[number, number]>([0, 0])
+  const [aimAngle, setAimAngle] = useState(0)
+
   return (
-    <main>
+    <main style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative" }}>
       <Canvas
         shadows
         camera={{ position: [3, 3, 3], fov: 45, near: 0.1, far: 50 }}
@@ -40,16 +45,26 @@ export const App = () => {
 
           <BilliardTable />
           <BallsGroup />
-          <Cue />
+          <CueControl power={power} contactOffset={contactOffset} aimAngle={aimAngle} />
           <OrbitControls
             makeDefault
             minPolarAngle={0.2}
             maxPolarAngle={Math.PI / 2.2}
             maxDistance={5}
+            enableZoom={false}
           />
           <Environment preset="city" />
         </Suspense>
       </Canvas>
+
+      <GameHud
+        power={power}
+        contactOffset={contactOffset}
+        aimAngle={aimAngle}
+        onPowerChange={setPower}
+        onContactOffsetChange={setContactOffset}
+        onAimAngleChange={setAimAngle}
+      />
     </main>
-  );
-};
+  )
+}
