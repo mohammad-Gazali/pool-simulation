@@ -28,3 +28,6 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 - 3D components use `group` wrappers, accept `position`/`rotation` props when reusable
 - Use `meshStandardMaterial` (roughness, metalness, envMapIntensity) — see `Ball.tsx` for reference
 - TypeScript: `noUnusedLocals`, `noUnusedParameters`, `verbatimModuleSyntax`, `erasableSyntaxOnly` — unused imports/exports are errors
+
+## Important References
+We use the file PHYSICS.md in the project root for references about the physics that we used inside this project
