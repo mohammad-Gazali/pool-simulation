@@ -1,178 +1,330 @@
-# Physics of Billiards: A Comprehensive Reference Model
+# **1. Introduction**
 
-## 1. Introduction
-The game of billiards has been studied for over 200 years. A major contribution to this field stems from Newton's research, which focused on the physical motion of objects, particularly collisions. This formed the foundation for dedicated studies on billiard dynamics. To understand the motion of a billiard ball, we must recognize four primary aspects of its movement:
-1. The motion of the ball on the table surface (involving friction, spin, and rolling).
-2. The motion of the ball upon collision with another ball.
-3. The motion of the ball upon collision with the table cushions.
-4. The motion of the ball when struck by a cue stick.
+The game of billiards has been studied for over 200 years. Among the most important contributions are the research of Newton, which focused on the physical motion of most objects, including collision motion — the foundation for dedicated studies of billiards. To understand the motion of a billiard ball, we must recognize that there are four main aspects of its motion:
 
-**Assumptions and Specifications for this Model:**
-* Air resistance during ball motion is neglected.
-* All balls are identical in size and weight, conforming to standard specifications used in all billiard tables.
-* The billiard table is perfectly level and parallel to the horizon; thus, gravity only acts perpendicular to the surface, and its reactive normal force cancels it out (no gravitational acceleration along the XY plane).
-* Standard constants for friction and restitution are adopted, as they are common in most billiard setups (detailed in Section 2).
-* Table cushions are not perfectly rigid; they are slightly soft and angled sharply (to be discussed in the cushion collision section).
-* A standard cue stick is assumed, with its related constants detailed below.
+- The ball's motion on the playing table surface, which includes friction forces, ball rotation, and rolling.
+- The ball's motion when colliding with another ball.
+- The ball's motion when colliding with the table cushions.
+- The ball's motion when struck by the billiard cue.
 
-## 2. Physical Properties of Game Components
+The following assumptions will be used in studying ball motion:
 
-### Billiard Ball Properties
-* **Diameter:** 2.25 inches (57.15 mm) $\rightarrow$ Radius $R \approx 0.028575$ m
-* **Mass ($m$):** 170 grams (0.170 kg)
-* **Moment of Inertia ($I$):** $I = \frac{2}{5} m R^2$ (Solid sphere approximation)
-
-### Friction and Restitution Coefficients
-* **Ball-to-Ball Friction Coefficient:** $0.03 - 0.08$
-* **Ball-to-Ball Coefficient of Restitution (COR):** $0.92 - 0.98$
-* **Rolling Friction Coefficient (Ball-to-Surface):** $\mu_r = 0.005 - 0.015$
-* **Sliding Friction Coefficient (Ball-to-Surface):** $\mu_s = 0.15 - 0.4$ (Typical value: $0.2$)
-* **Ball-to-Cushion COR:** $e_c = 0.6 - 0.9$
-* **Cue Tip-to-Ball Friction Coefficient:** $\mu_{cue} = 0.6$
-* **Cue Tip-to-Ball COR (Leather tip):** $e_{cue} = 0.71 - 0.75$
-
-### Other Constants
-* **Rotational Deceleration Rate (Spin decay):** $5 - 15$ rad/s² (phenomenological)
-* **Ball-to-Surface COR (Vertical bounce):** $0.5 - 0.7$
+1. The effect of air resistance on ball motion will be neglected.
+2. The balls will be identical in size and weight, conforming to standard specifications used in all billiard tables; all balls are assumed to meet these standards.
+3. The billiard table is flat and horizontal, so there will be no effect from gravity or its reaction force.
+4. Standard friction and restitution constants will be adopted, as commonly used in most billiard tables and balls; these will be mentioned in the next section.
+5. The table cushions are soft (not completely rigid) and are inclined at a specific angle to be discussed later.
+6. A standard-specification cue will be used; its related constants will be mentioned in the next section.
 
 ---
 
-## 3. Ball-Surface Motion Dynamics
-A ball interacting with the table surface exists in one of four states:
-1. **Rest:** No motion.
-2. **Pure Rotation (Spinning in place):** Rotating around its vertical axis without linear translation.
-3. **Rolling without Slipping:** Perfect harmonic synchronization of linear and angular motion.
-4. **Rolling with Slipping:** Complex state causing trajectory deviation (swerve/throw).
+# **2. Physical Properties of the Game Components**
 
-### 3.1 State of Rest
-The ball is completely stationary. The primary component equations are:
-$$ \vec{r}(t) = \vec{r}_0 $$
-$$ \vec{v}(t) = \vec{0} $$
-$$ \vec{\omega}(t) = \vec{0} $$
-*Where $\vec{r}$ is the position vector, $\vec{v}$ is the linear velocity vector, and $\vec{\omega}$ is the angular velocity vector.*
+## Billiard Ball Properties
 
-### 3.2 State of Pure Rotation
-Rotation occurs strictly around the $z$-axis (vertical). If rotation occurred around $x$ or $y$, it would generate friction with the surface, converting into linear velocity, which is excluded from this specific state. 
-*Note on modeling:* A single point of contact theoretically generates no friction torque. However, in reality, the contact area is a small surface, not a point. To avoid overcomplicating the mathematical model, a **phenomenological rotational friction coefficient** ($\mu_{spin}$) is introduced to slow the spin to a halt. *(Author's note: This is a "fudge factor" temporarily added to the model to explain an observation that the base assumptions don't fully capture. It is a common scientific simplification).*
+- Ball diameter: 2.25 inches (57.15 mm)
+- Ball mass: 170 g
+- Moment of inertia of the ball: **I = (2/5) m R²**
 
-The equations for this state are:
-$$ \omega_z(t) = \omega_{z0} - \left( \frac{5 \mu_{spin} g}{2 R} \right) t $$
-$$ v_x(t) = 0, \quad v_y(t) = 0 $$
-*Constraint:* These equations are valid until the ball stops spinning, which occurs when $\omega_z(t) = 0$, at time $t_{stop} = \frac{2 R \omega_{z0}}{5 \mu_{spin} g}$.
+## Friction Coefficients
 
-### 3.3 Rolling Without Slipping
-In this state, linear motion is perfectly synchronized with rotational motion. The relative velocity at the contact point is zero:
-$$ \vec{v}_{rel} = \vec{v} + \vec{\omega} \times (R \hat{k}) = \vec{0} \implies \vec{v} = \vec{\omega} \times (R \hat{k}) $$
+- Ball-to-ball friction coefficient **μ_bb**: 0.03 – 0.08
+- Ball-to-ball restitution coefficient **e_bb**: 0.92 – 0.98
+- Rolling friction coefficient between ball and surface **μ_r**: 0.005 – 0.015
+- Sliding friction coefficient between ball and surface **μ_s**: 0.15 – 0.4 (0.2 in normal conditions)
+- Ball-to-cushion restitution coefficient **e_bc**: 0.6 – 0.9
+- Friction coefficient between cue tip and ball **μ_tip**: 0.6
+- Restitution coefficient between cue tip and ball **e_tip**: 0.71 – 0.75 (for a leather tip)
 
-**Linear Motion Equations:**
-$$ \vec{v}(t) = \vec{v}_0 - \mu_r g t \, \hat{u}_v $$
-$$ \vec{r}(t) = \vec{r}_0 + \vec{v}_0 t - \frac{1}{2} \mu_r g t^2 \, \hat{u}_v $$
-*Where $\hat{u}_v$ is the unit vector in the direction of $\vec{v}_0$.*
+## Other Constants
 
-**Angular Motion Constraints:**
-From $\vec{v} = \vec{\omega} \times (R \hat{k})$, we derive:
-$$ \omega_x = -\frac{v_y}{R}, \quad \omega_y = \frac{v_x}{R}, \quad \omega_z = 0 $$
-*(Note: $\omega_z$ does not affect pure forward rolling, but any residual $\omega_z$ from a previous state decays independently as described in 3.2).*
-
-### 3.4 Rolling With Slipping
-This is the most complex state. It occurs when the relative velocity at the contact point is non-zero ($\vec{v}_{rel} \neq \vec{0}$). This generates a kinetic friction force that opposes the slip direction, causing the ball's trajectory to curve (swerve).
-
-**Relative Velocity at Contact Point:**
-$$ \vec{v}_{rel} = \vec{v} + \vec{\omega} \times (R \hat{k}) $$
-
-**Friction Force:**
-$$ \vec{F}_f = -\mu_s m g \frac{\vec{v}_{rel}}{|\vec{v}_{rel}|} $$
-
-**Equations of Motion (Newton-Euler):**
-$$ \frac{d\vec{v}}{dt} = -\mu_s g \frac{\vec{v}_{rel}}{|\vec{v}_{rel}|} $$
-$$ \frac{d\vec{\omega}}{dt} = \frac{R}{I} (\vec{F}_f \times \hat{k}) = -\frac{5 \mu_s g}{2 R} \left( \frac{\vec{v}_{rel}}{|\vec{v}_{rel}|} \times \hat{k} \right) $$
-*The ball remains in this state until $|\vec{v}_{rel}| = 0$, at which point it transitions to "Rolling Without Slipping".*
+- Rotational deceleration rate between ball and surface: 5 – 15 **rad/s²**
+- Ball-to-surface restitution coefficient **e_bs**: 0.5 – 0.7
 
 ---
 
-## 4. Ball-to-Ball Collision Dynamics
-To keep the model computationally efficient yet highly accurate, we apply the following constraints:
-* Collisions are perfectly elastic (no energy loss).
-* Collisions are instantaneous (time of impact $\Delta t \to 0$).
-* Inter-ball friction during the infinitesimal impact time is neglected.
+# **3. Ball Motion on the Table Surface**
 
-Let $t_c$ be the moment of collision, and $t_c^+$ be the time immediately after. Let $\hat{n}$ be the unit vector along the line connecting the centers of the two balls at the moment of impact, and $\hat{t}$ be the tangent vector perpendicular to $\hat{n}$.
+The ball has four possible states in relation to the surface:
 
-### 4.1 Case 1: One Moving Ball (A), One Stationary Ball (B)
-Based on the conservation of linear momentum and kinetic energy for equal-mass spheres:
-$$ \vec{v}_A' = \vec{v}_A - (\vec{v}_A \cdot \hat{n})\hat{n} $$
-$$ \vec{v}_B' = (\vec{v}_A \cdot \hat{n})\hat{n} $$
-*Note: Because the collision is instantaneous, the positions $\vec{r}_A$ and $\vec{r}_B$, and the angular velocities $\vec{\omega}_A$ and $\vec{\omega}_B$ remain unchanged during the impact.*
-
-### 4.2 Case 2: Both Balls Moving
-We solve this by shifting the frame of reference so that Ball B appears stationary. We calculate the relative velocity $\vec{v}_{rel} = \vec{v}_A - \vec{v}_B$, apply the equations from Case 1 to $\vec{v}_{rel}$, and then transform back to the global frame:
-$$ \vec{v}_A' = \vec{v}_A - [(\vec{v}_A - \vec{v}_B) \cdot \hat{n}]\hat{n} $$
-$$ \vec{v}_B' = \vec{v}_B + [(\vec{v}_A - \vec{v}_B) \cdot \hat{n}]\hat{n} $$
+1. **Rest state**: No motion at all.
+2. **Spinning state**: The ball rotates around itself (spin only).
+3. **Rolling without slipping**.
+4. **Rolling with slipping**.
 
 ---
 
-## 5. Ball-to-Cushion Collision Dynamics
-This is the most complex section due to multiple factors: cushion height, softness, impact angle, linear velocity, and angular velocity. We adopt a simplified rigid-body impulse model (based on Han Model, 2005).
+## Rest State
 
-**Assumptions:**
-* Collision is instantaneous.
-* Cushion deformation is neglected for the impulse calculation, but its effect is captured via the Coefficient of Restitution ($e_c$).
+In this state, the ball is completely stationary. The component equations are:
 
-**Geometry:**
-Let $h$ be the height of the cushion contact point above the table. The impact angle $\theta$ (between the cushion normal and the ball's velocity vector) dictates the direction of the impulse.
+$$\mathbf{r}(t) = \mathbf{r}_0$$
 
-**Impulse-Momentum Equations:**
-Let $v_n$ be the normal velocity component (towards the cushion) and $\vec{v}_t$ be the tangential velocity component at the contact point.
-1. **Normal Velocity Reversal:**
-   $$ v_n' = -e_c v_n $$
-2. **Tangential Velocity and Spin Update:**
-   The friction impulse $J_t$ depends on whether the contact point sticks or slips.
-   *If slipping occurs throughout impact:*
-   $$ J_t = \mu_c J_n $$
-   *If sticking occurs (friction is sufficient to halt slip before impact ends):*
-   $$ J_t = \frac{m v_{t, initial}}{1 + \frac{m R^2}{I}} = \frac{2}{7} m v_{t, initial} $$
+$$\mathbf{v}(t) = \mathbf{0}$$
 
-**Final Post-Collision State:**
-$$ \vec{v}' = \vec{v} + \frac{1}{m} (J_n \hat{n} + J_t \hat{t}) $$
-$$ \vec{\omega}' = \vec{\omega} + \frac{R}{I} (J_t \hat{t} \times \hat{k}) $$
-*Where $J_n = m(1+e_c)v_n$ is the normal impulse.*
+$$\boldsymbol{\omega}(t) = \mathbf{0}$$
+
+Where:
+- **r(t)**: position vector as a function of time
+- **r₀**: initial position vector
+- **v(t)**: linear velocity vector as a function of time
+- **ω(t)**: angular velocity vector as a function of time
 
 ---
 
-## 6. Cue-to-Ball Collision Dynamics
-This section models the initial strike of the cue stick on the cue ball. The resulting spin depends on the offset coordinates $(x, y)$ from the center of the ball, where $x$ is the horizontal offset (sidespin) and $y$ is the vertical offset (topspin/backspin).
+## Spinning State
 
-**Geometric Constraint:**
-The strike point must be on the surface of the ball:
-$$ x^2 + y^2 \le R^2 $$
+Rotation about the z-axis only is a constraint imposed in this state, because if we also take rotation about x and y into account, that would generate a friction force against the surface which would produce linear velocity — which is not what we want to model here. Therefore, if the net rotation is only around the z-axis, the linear velocity will be zero.
 
-**Initial Linear Velocity ($v_0$):**
-Based on inelastic collision principles between the cue (effective mass $M_{eff}$) and the ball ($m$):
-$$ v_0 = \left( \frac{1 + e_{cue}}{1 + \frac{m}{M_{eff}}} \right) v_{cue} $$
+To determine the equation of rotational motion, we note that there is a contact point between the surface and the ball. When the ball spins, the force is dissipated due to the friction between the ball and the surface.
 
-**Initial Angular Velocity ($\vec{\omega}_0$):**
-The impulse $J = m v_0$ generates torque. Using $I = \frac{2}{5}mR^2$:
-$$ \omega_x = 0 $$
-$$ \omega_y = \frac{5}{2} \frac{v_0 y}{R^2} \quad \text{(Topspin/Backspin)} $$
-$$ \omega_z = -\frac{5}{2} \frac{v_0 x}{R^2} \quad \text{(Sidespin)} $$
+*However, when rotation is about a single point, this does not generate a friction force. To explain this logically, the contact region between the ball and the surface is an area (not a point), but this complicates our mathematical model. To resolve this, we introduce a phenomenological friction coefficient that causes the ball's spin to decelerate to zero.*
 
-**Transition to Rolling:**
-Immediately after the strike, the ball is in a "Rolling with Slipping" state. It will naturally evolve toward "Rolling without Slipping". The final steady-state rolling velocity $v_{roll}$ (ignoring table friction for the transition calculation) is:
-$$ v_{roll} = \frac{5}{7} v_0 + \frac{2}{7} \omega_{y0} R $$
+*This coefficient is added to the model temporarily to account for a phenomenon (in this case, deceleration of ball spin) that does not arise from the model's assumptions. This is what researchers do when they want to model an observation but their model is insufficient — it is a form of scientific simplification.*
 
-**Maximum Sidespin (SRF - Spin Rate Factor):**
-To achieve maximum sidespin without miscuing, the optimal strike point is found by maximizing $\omega_z$ subject to the friction limit of the cue tip. This typically occurs at an offset angle below the horizontal axis. The theoretical maximum safe offset is approximately:
-$$ x_{max} \approx R \sin(\theta_{miscue}) \approx 0.5R \text{ to } 0.7R $$
-*(Where $\theta_{miscue}$ is the maximum angle before the cue tip slips off the ball, dependent on $\mu_{cue}$).*
+The component equations for this state are:
+
+$$\mathbf{r}(t) = \mathbf{r}_0$$
+
+$$\mathbf{v}(t) = \mathbf{0}$$
+
+$$\boldsymbol{\omega}(t) = \boldsymbol{\omega}_0 - \frac{\mu_{sp}\, g}{R}\, \hat{\boldsymbol{\omega}}_0\, t$$
+
+With the constraint:
+
+$$\omega_x = \omega_y = 0$$
+
+Where:
+- **R**: ball radius
+- **ω₀**: initial angular velocity
+- **μ_sp**: spin deceleration coefficient
+
+Note that the x and y components are both zero (as discussed). For the z-coordinate, the equation states that the angular velocity of the ball decreases linearly over time. These equations are valid until the ball stops spinning — that is, when **ω_z(t) = 0**, which occurs at:
+
+$$t_{stop} = \frac{R\, \omega_{z0}}{\mu_{sp}\, g}$$
 
 ---
 
-## 7. References
-1. Alciatore, D. G. *Pool and Billiards Physics — Technical Proof TP B-17: Maximum Drag-Enhanced Sidespin Tip Contact Point.* drdavepoolinfo.com, 2015–2019.
-2. Alciatore, D. G. *Pool and Billiards Physics — Technical Proof TP B-6: Cue-Ball Spin and Speed After Impact.* drdavepoolinfo.com, 2015–2019.
-3. Alciatore, D. G. *Pool Physics Property Constants (Physical Properties FAQ).* drdavepoolinfo.com/faq/physics/physical-properties/, 2023.
-4. Han, I. *Dynamics in carom and three cushion billiards.* KSME International Journal, Springer, 2005.
-5. Kiefl, E. *The physics of pool/billiards.* ekiefl.github.io/2020/04/24/pooltool-theory/, April 2020.
+## Rolling Without Slipping
 
---- 
-*End of Document. This formatted version is optimized for ingestion by AI agents, with clear variable definitions and standard LaTeX mathematical representations.*
+In this state, the linear motion is perfectly coordinated with the rotational motion, expressed physically as:
+
+$$\mathbf{v} = R\, \boldsymbol{\omega} \times \hat{\mathbf{z}}$$
+
+The equation of linear motion is:
+
+$$\mathbf{v}(t) = \mathbf{v}_0 - \mu_r\, g\, \hat{\mathbf{v}}_0\, t$$
+
+$$\mathbf{r}(t) = \mathbf{r}_0 + \mathbf{v}_0\, t - \frac{1}{2}\, \mu_r\, g\, \hat{\mathbf{v}}_0\, t^2$$
+
+Where:
+- **μ_r**: rolling (without-slip) friction coefficient
+- **v̂₀**: unit vector in the direction of **v₀**
+
+For the rotational motion: rolling without slipping means the **relative velocity** between the ball and the table surface at the contact point is zero. That is:
+
+$$\mathbf{v}_{rel} = \mathbf{v} + \boldsymbol{\omega} \times R\hat{\mathbf{n}} = \mathbf{0}$$
+
+Expanding the cross product:
+
+$$\boldsymbol{\omega} \times R\hat{\mathbf{n}} = R\,(-\omega_y,\; \omega_x,\; 0)$$
+
+This gives three results:
+
+1. For the right-hand side to point in the x-direction (required for rolling without slipping), the angular velocity component **ω_x** must be zero. Thus there is no rotation in the direction of motion.
+
+2. From the constraint equation **v = -R(ω × n̂)**, we can determine **ω_y** (since **v₀** is already known), giving:
+
+$$\boldsymbol{\omega}(t) = \left(0,\; \frac{v(t)}{R},\; \omega_z\right)$$
+
+   Note that **ω_y** is always positive, meaning the rotation must be topspin, not backspin.
+
+3. The absence of **ω_z** from the equation means it has no effect on rolling-without-slip motion at all. Its value can be taken from the spinning state studied earlier, since rotation about the z-axis does not affect the rolling-without-slip state.
+
+The component equations with respect to the **table coordinate system** are given using the rotation matrix:
+
+$$\boldsymbol{\omega}_{table} = R^{-1}(\theta)\,\boldsymbol{\omega}_{ball}$$
+
+$$\begin{pmatrix} \omega_x \\ \omega_y \\ \omega_z \end{pmatrix}_{table}
+= \begin{pmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{pmatrix}
+\begin{pmatrix} 0 \\ v/R \\ \omega_z \end{pmatrix}_{ball}$$
+
+With the same z-axis constraint as in the ball coordinate system.
+
+---
+
+## Rolling With Slipping
+
+Slipping occurs when the **relative velocity** between the ball and the table surface at the contact point is **non-zero**. This is the most complex case because it causes a deflection in the ball's path due to friction.
+
+The friction forces come from both linear motion and rotational motion, producing a resultant force that deflects the ball's path. This resultant is opposite in direction to the relative velocity and acts in that same plane.
+
+The relative velocity at the contact point is:
+
+$$\mathbf{v}_{rel} = \mathbf{v} + \boldsymbol{\omega} \times R\hat{\mathbf{n}}$$
+
+The friction force vector for rolling with slipping:
+
+$$\mathbf{F}_{friction} = -\mu_s\, m\, g\, \hat{\mathbf{v}}_{rel}$$
+
+The equations of motion in the **ball coordinate system** are:
+
+$$\dot{\mathbf{v}} = -\mu_s\, g\, \hat{\mathbf{v}}_{rel}$$
+
+$$\dot{\boldsymbol{\omega}} = \frac{5\,\mu_s\, g}{2\,R}\,(\hat{\mathbf{n}} \times \hat{\mathbf{v}}_{rel})$$
+
+The equations in the **table coordinate system** are obtained by the same rotation matrix as above.
+
+With the same z-axis constraint as in the ball-coordinate rolling-with-slip case.
+
+---
+
+# **4. Ball–Ball Collision**
+
+We now study ball-to-ball collisions with the following simplifying assumptions:
+
+1. The collision is elastic (no energy loss).
+2. The collision is instantaneous.
+3. Friction between the balls during collision is neglected.
+
+These assumptions, while not perfectly accurate, give results that closely approximate reality because these effects are weak in most cases.
+
+We study two sub-cases:
+1. One ball is stationary, the other is moving.
+2. Both balls are moving.
+
+> **Notation:** The symbol **t₀** denotes the instant of collision; **t₀⁺** denotes the time immediately after. Since the collision is instantaneous, position and angle do not change.
+
+---
+
+## Case 1: One Ball at Rest
+
+Ball **A** is moving and strikes stationary ball **B**.
+
+Using conservation of momentum and conservation of energy (elastic collision):
+
+$$m\,\mathbf{v}_A = m\,\mathbf{v}_A^+ + m\,\mathbf{v}_B^+$$
+
+$$\frac{1}{2}m\,v_A^2 = \frac{1}{2}m\,(v_A^+)^2 + \frac{1}{2}m\,(v_B^+)^2$$
+
+Using trigonometry (with the contact-point normal defining the collision angle **φ**):
+
+$$\mathbf{v}_B^+ = v_A\,\cos\phi\;\hat{\mathbf{n}}$$
+
+$$\mathbf{v}_A^+ = v_A\,\sin\phi\;\hat{\mathbf{t}}$$
+
+$$\boldsymbol{\omega}_A^+ = \boldsymbol{\omega}_A,\quad \boldsymbol{\omega}_B^+ = \mathbf{0}$$
+
+Where **t₀⁺** refers to time immediately after the collision.
+
+---
+
+## Case 2: Both Balls Moving
+
+We change the reference frame so that ball **B** is at rest. In this frame the effective incoming velocity of ball **A** is:
+
+$$\mathbf{v}'_A = \mathbf{v}_A - \mathbf{v}_B$$
+
+Then apply the Case 1 equations with **v'_A** as the incident velocity, giving:
+
+$$\mathbf{v}_B^{+} = \mathbf{v}_B + (v'_A\,\cos\phi)\;\hat{\mathbf{n}}$$
+
+$$\mathbf{v}_A^{+} = \mathbf{v}_A - (v'_A\,\cos\phi)\;\hat{\mathbf{n}}$$
+
+---
+
+# **5. Ball–Cushion Collision**
+
+This is the most complex section because many factors come into play: friction, cushion height, shape, softness, the angle at which the ball strikes the cushion, spin, and linear velocity.
+
+The model used here is the **Han (2005) Model**, which adopts the following simplifications:
+
+- The collision is instantaneous.
+- Deformation of the cushion is neglected.
+
+Let **h** denote the height of the cushion contact point above the table surface, and **θ** the inclination angle of the cushion. The contact height is:
+
+$$h = R(1 + \sin\theta)$$
+
+The direction of the impulse from the cushion on the ball is determined by **θ**.
+
+The equations of motion in the **ball coordinate system** for a cushion collision are:
+
+**Linear velocity update:**
+
+$$v_x^+ = -e_{bc}\,v_x$$
+
+$$v_y^+ = v_y - \frac{5}{7}\,\mu_b\,(1 + e_{bc})\,v_x\,\cos\theta\,\sin\theta$$
+
+$$v_z^+ = 0$$
+
+**Angular velocity update:**
+
+$$\omega_x^+ = \omega_x + \frac{5}{2R}\,\mu_b\,(1+e_{bc})\,v_x\,\cos\theta\,\cos\phi_c$$
+
+$$\omega_y^+ = \omega_y$$
+
+$$\omega_z^+ = \omega_z + \frac{5}{2R}\,\mu_b\,(1+e_{bc})\,v_x\,\cos\theta\,\sin\phi_c$$
+
+With the same z-axis constraint as the ball-coordinate rolling-with-slip case.
+
+The table-coordinate equations are obtained using the rotation matrix as before.
+
+---
+
+# **6. Cue–Ball Collision**
+
+When the cue strikes the ball at a position **(a, b)** relative to the ball center, the impulse transfer and resulting velocities are governed by the following relations.
+
+**Normal impulse** (along the cue axis direction **û_c**):
+
+$$J_n = \frac{(1 + e_{tip})\,m\,v_{cue}\,\cos\alpha}
+         {1 + \dfrac{m}{M_{cue}} + \dfrac{5}{2}\left(\dfrac{a^2 + b^2}{R^2}\right)}$$
+
+**Linear velocity just after impact:**
+
+$$\mathbf{v}_0 = \frac{J_n}{m}\,\hat{\mathbf{u}}_c$$
+
+**Angular velocity just after impact:**
+
+$$\boldsymbol{\omega}_0 = \frac{5\,J_n}{2\,m\,R^2}\,(\mathbf{r}_{contact} \times \hat{\mathbf{u}}_c)$$
+
+In component form (with the cue in the xz-plane, contact offset **(a, b)**):
+
+$$v_{0x} = \frac{J_n}{m}\,\cos\alpha$$
+
+$$v_{0y} = 0,\quad v_{0z} = -\frac{J_n}{m}\,\sin\alpha$$
+
+$$\omega_{0x} = -\frac{5\,J_n\,b}{2\,m\,R^2}$$
+
+$$\omega_{0y} = \frac{5\,J_n\,(a\,\sin\alpha + R\cos\alpha - R\sqrt{1 - a^2/R^2})}{2\,m\,R^2}$$
+
+$$\omega_{0z} = \frac{5\,J_n\,b\,\cos\alpha}{2\,m\,R^2}$$
+
+---
+
+# **7. Maximizing Sidespin (SRF)**
+
+To achieve maximum sidespin on the stroke, one must maximize the **Spin-to-Roll Factor (SRF)**:
+
+$$\text{SRF} = \frac{|\omega_z|}{|\boldsymbol{\omega}_{yz}|}$$
+
+After applying the boundary conditions on *x* and *y*, the optimal cue contact point is:
+
+$$a_{opt} = 0,\quad b_{opt} = \sqrt{R^2 - c^2}$$
+
+where **c** is the elevation of the contact point. This point lies at angle **φ = arctan(b/R)** below the x-axis relative to the ball center.
+
+---
+
+# **8. References**
+
+\[1\] Alciatore, D. G. *Pool and Billiards Physics — Technical Proof TP B-17: Maximum Drag-Enhanced Sidespin Tip Contact Point.* drdavepoolinfo.com, 2015–2019.
+
+\[2\] Alciatore, D. G. *Pool and Billiards Physics — Technical Proof TP B-6: Cue-Ball Spin and Speed After Impact.* drdavepoolinfo.com, 2015–2019.
+
+\[3\] Alciatore, D. G. *Pool Physics Property Constants (Physical Properties FAQ).* drdavepoolinfo.com/faq/physics/physical-properties/, 2023.
+
+\[4\] Han, I. *Dynamics in carom and three cushion billiards.* KSME International Journal, Springer, 2005.
+
+\[5\] Kiefl, E. *The physics of pool/billiards.* ekiefl.github.io/2020/04/24/pooltool-theory/, April 2020.

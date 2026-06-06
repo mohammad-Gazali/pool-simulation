@@ -12,7 +12,7 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 
 ## Architecture
 
-- `src/constants/index.ts` — shared constants
+- `src/constants/index.ts` — only `BALL_RADIUS`; ball visual configs (`BallConfig` + `BALLS_CONFIG`) live in `balls-group.tsx`
 - `src/models/` — individual 3D components
 - `src/groups/` — composed scene objects
 - `src/app.tsx` — root: Canvas, lighting, scene assembly
