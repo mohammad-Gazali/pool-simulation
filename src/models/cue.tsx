@@ -33,7 +33,7 @@ interface CueProps {
 }
 
 export const Cue = ({
-  position = [-1.6875, -0.36, 0],
+  position = [-1.75, -0.40, 0],
   rotation = [0, 0, -Math.PI / 2],
 }: CueProps) => {
   return (
