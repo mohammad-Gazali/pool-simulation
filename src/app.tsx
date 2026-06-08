@@ -11,6 +11,13 @@ export const App = () => {
   const [contactOffset, setContactOffset] = useState<[number, number]>([0, 0])
   const [aimAngle, setAimAngle] = useState(0)
 
+  const handleHit = () => {
+    void power
+    void contactOffset
+    void aimAngle
+    // TODO: trigger physics shot
+  }
+
   return (
     <main style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative" }}>
       <Canvas
@@ -50,8 +57,8 @@ export const App = () => {
             makeDefault
             minPolarAngle={0.2}
             maxPolarAngle={Math.PI / 2.2}
+            minDistance={0.5}
             maxDistance={5}
-            enableZoom={false}
           />
           <Environment preset="city" />
         </Suspense>
@@ -64,6 +71,7 @@ export const App = () => {
         onPowerChange={setPower}
         onContactOffsetChange={setContactOffset}
         onAimAngleChange={setAimAngle}
+        onHit={handleHit}
       />
     </main>
   )

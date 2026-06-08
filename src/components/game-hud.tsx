@@ -9,6 +9,7 @@ interface GameHudProps {
   onPowerChange: (power: number) => void
   onContactOffsetChange: (offset: [number, number]) => void
   onAimAngleChange: (angle: number) => void
+  onHit: () => void
 }
 
 export const GameHud = ({
@@ -18,6 +19,7 @@ export const GameHud = ({
   onPowerChange,
   onContactOffsetChange,
   onAimAngleChange,
+  onHit,
 }: GameHudProps) => {
   const aimAngleRef = useRef(aimAngle)
   aimAngleRef.current = aimAngle
@@ -37,11 +39,19 @@ export const GameHud = ({
 
   return (
     <div className="ui-overlay">
-      <div className="ui-left">
-        <ContactPicker offset={contactOffset} onChange={onContactOffsetChange} />
-      </div>
-      <div className="ui-right">
-        <PowerGauge power={power} onChange={onPowerChange} />
+      <div className="ui-controls">
+        <div className="ui-controls-header">CONTROLS</div>
+        <div className="ui-controls-body">
+          <ContactPicker offset={contactOffset} onChange={onContactOffsetChange} />
+          <PowerGauge power={power} onChange={onPowerChange} />
+        </div>
+        <button
+          className="hit-button"
+          disabled={power <= 0}
+          onClick={onHit}
+        >
+          HIT
+        </button>
       </div>
     </div>
   )

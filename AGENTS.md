@@ -17,20 +17,27 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 - `src/physics/` — simulation engine (equations, collision detection, motion integration). Physics own constants live in `src/physics/constants.ts` (defines `CUSHION_ANGLE`, trig values, `CUSHION_CONTACT_HEIGHT` — **source of truth** for cushion angle). Presentation/3D code imports directly from here when it needs the angle
 - `src/models/` — individual 3D components
 - `src/groups/` — composed scene objects
-- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, game-hud)
-- `src/app.tsx` — root: Canvas, lighting, scene assembly
+- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, game-hud). GameHud controls are grouped in a single panel (semi-transparent box, right side of screen): ContactPicker (left) + PowerGauge (right) side-by-side, with a HIT button below. HIT button is disabled when `power <= 0`
+- `src/app.tsx` — root: Canvas, lighting, scene assembly, passes `onHit` callback to GameHud
 
 ## Scene layout
 
 - Table group at `y=-0.5`, felt surface at world `y=-0.44` (`-0.5 + 0.05 + 0.01`)
 - Balls group at `y=-0.44`; cue ball at `[-1.0, BALL_RADIUS, 0]` local → `[-1.0, -0.40, 0]` world
 - Cue at `[-1.75, -0.40, 0]`, tip points +X toward cue ball with 0.02 gap at ball center height; built along local Y axis with rotation `[0, 0, -PI/2]`
+- Camera: `OrbitControls` with `minDistance={0.5}`, `maxDistance={5}`, polar angle clamped 0.2–π/2.2; zoom enabled
+- Cushions: right-trapezoid cross-section via `ExtrudeGeometry`, two 90° at outer face, 60° inner face (`CUSHION_ANGLE`). Each rail's inner edge bottom aligns with the felt boundary; rails extend to the adjacent cushion's outer edge so corners form a closed rectangle. Overlap per side = `CUSHION_BOTTOM_WIDTH = halfBottom + halfTop`.
 
 ## Conventions
 
 - 3D components use `group` wrappers, accept `position`/`rotation` props when reusable
 - Use `meshStandardMaterial` (roughness, metalness, envMapIntensity) — see `Ball.tsx` for reference
 - TypeScript: `noUnusedLocals`, `noUnusedParameters`, `verbatimModuleSyntax`, `erasableSyntaxOnly` — unused imports/exports are errors
+
+## Agent Behavior
+- Update AGENTS.md with any meaningful architectural, UI, or behavioral changes you make — don't wait to be asked
+- Keep the "Architecture" section synced with new components, props, and data flow
+- Update "Scene layout" when 3D positioning or camera setup changes
 
 ## Important References
 We use the file PHYSICS.md in the project root for references about the physics that we used inside this project
