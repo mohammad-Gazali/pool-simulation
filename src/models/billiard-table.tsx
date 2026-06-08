@@ -51,18 +51,22 @@ function CushionRail({ length, position, rotation }: { length: number; position:
   )
 }
 
+const FELT_SURFACE_Y = FELT_THICKNESS + 0.05
+const POCKET_DEPTH = 0.15
+const FELT_EDGE_X = TABLE_WIDTH / 2 - FELT_OFFSET
+const FELT_EDGE_Z = TABLE_HEIGHT / 2 - FELT_OFFSET
+const POCKET_INSET = 0.9
+
+function Pocket({ x, z, radius }: { x: number; z: number; radius: number }) {
+  return (
+    <mesh position={[x, FELT_SURFACE_Y - POCKET_DEPTH / 2 + 0.006, z]}>
+      <cylinderGeometry args={[radius, radius, POCKET_DEPTH, 32]} />
+      <meshStandardMaterial color="#050505" />
+    </mesh>
+  )
+}
+
 export const BilliardTable = () => {
-  const thickness = 0.01;
-
-  const pocketPositions: [number, number][] = [
-    [-TABLE_WIDTH / 2, -TABLE_HEIGHT / 2],
-    [TABLE_WIDTH / 2, -TABLE_HEIGHT / 2],
-    [-TABLE_WIDTH / 2, TABLE_HEIGHT / 2],
-    [TABLE_WIDTH / 2, TABLE_HEIGHT / 2],
-    [-TABLE_WIDTH / 2, 0],
-    [TABLE_WIDTH / 2, 0],
-  ];
-
   return (
     <group position={[0, -0.5, 0]}>
       {/* Table Base */}
@@ -140,12 +144,26 @@ export const BilliardTable = () => {
         rotation={[0, Math.PI, 0]}
       />
 
-      {/* Pockets */}
-      {pocketPositions.map(([x, z], i) => (
-        <mesh key={i} position={[x, thickness / 2 - 0.01, z]}>
-          <cylinderGeometry args={[0.065, 0.055, 0.1, 32]} />
-          <meshStandardMaterial color="#050505" />
-        </mesh>
+      {/* Corner pockets (inset from felt edge so they appear cut into the carpet) */}
+      {([-1, 1] as const).flatMap((sx) =>
+        ([-1, 1] as const).map((sz) => (
+          <Pocket
+            key={`c${sx}${sz}`}
+            x={sx * FELT_EDGE_X * POCKET_INSET + (sx * 0.04)}
+            z={sz * FELT_EDGE_Z * POCKET_INSET - (sz * 0.02)}
+            radius={0.11}
+          />
+        )),
+      )}
+
+      {/* Side pockets along top/bottom edges (long sides, along table width) */}
+      {([-1, 1] as const).map((sz) => (
+        <Pocket
+          key={`s${sz}`}
+          x={0}
+          z={sz * FELT_EDGE_Z * POCKET_INSET - (sz * 0.01)}
+          radius={0.1}
+        />
       ))}
     </group>
   );

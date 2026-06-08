@@ -27,6 +27,7 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 - Cue at `[-1.75, -0.40, 0]`, tip points +X toward cue ball with 0.02 gap at ball center height; built along local Y axis with rotation `[0, 0, -PI/2]`
 - Camera: `OrbitControls` with `minDistance={0.5}`, `maxDistance={5}`, polar angle clamped 0.2–π/2.2; zoom enabled
 - Cushions: right-trapezoid cross-section via `ExtrudeGeometry`, two 90° at outer face, 60° inner face (`CUSHION_ANGLE`). Each rail's inner edge bottom aligns with the felt boundary; rails extend to the adjacent cushion's outer edge so corners form a closed rectangle. Overlap per side = `CUSHION_BOTTOM_WIDTH = halfBottom + halfTop`.
+- Pockets: 4 corner + 2 side (along long edges), `cylinderGeometry` dark holes inset to 90% of felt edge. Corner radius 0.11, side radius 0.1, Y offset `+0.006` above surface to sit within carpet.
 
 ## Conventions
 
