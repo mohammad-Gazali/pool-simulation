@@ -17,8 +17,13 @@ const CUSHION_COLOR = "#2a1a0f";
 
 const CORNER_THICKNESS = 0.4;
 
+const CUSHION_ELEVATION = 0.03
+
 const halfBottom = CUSHION_WIDTH / 2
 const halfTop = halfBottom - CUSHION_HEIGHT / Math.tan(CUSHION_ANGLE)
+
+const CUSHION_INNER_OFFSET = FELT_OFFSET - halfTop
+const CUSHION_BOTTOM_WIDTH = halfBottom + halfTop
 
 function createCushionShape() {
   const shape = new THREE.Shape()
@@ -103,36 +108,35 @@ export const BilliardTable = () => {
         <meshStandardMaterial color={FELT_COLOR} roughness={0.9} />
       </mesh>
 
-      {/* Cushions / Rails — trapezoid cross-section
-           Shape XY = across × vertical, extrude along +Z.
-           After rotation: shape X maps to local Z (top/bottom) or local X (left/right).
-           Inner face (shape +X) always faces the table center.
-           Inner edge bottom is flush with felt edge. */}
-      {/* Top (runs along +X at +Z edge, inner face toward -Z) */}
+      {/* Cushions — right-trapezoid cross-section (two 90° at outer face,
+           inner face at CUSHION_ANGLE = 60° from horizontal). Shape XY = across × vertical,
+           extrude +Z. After rotation: shape X axes map to local Z (top/bottom) or
+           local X (left/right); inner edge bottom is flush with felt edge. */}
+      {/* Top (runs +X at +Z edge, inner face toward -Z, spans between outer edges of side cushions) */}
       <CushionRail
-        length={TABLE_WIDTH}
-        position={[-TABLE_WIDTH / 2, 0.02, TABLE_HEIGHT / 2 - 0.1]}
+        length={TABLE_WIDTH - 2 * FELT_OFFSET + 2 * CUSHION_BOTTOM_WIDTH}
+        position={[-TABLE_WIDTH / 2 + FELT_OFFSET - CUSHION_BOTTOM_WIDTH, CUSHION_ELEVATION, TABLE_HEIGHT / 2 - CUSHION_INNER_OFFSET]}
         rotation={[0, Math.PI / 2, 0]}
       />
 
-      {/* Bottom (runs along +X at -Z edge, inner face toward +Z) */}
+      {/* Bottom (runs +X at -Z edge, inner face toward +Z) */}
       <CushionRail
-        length={TABLE_WIDTH}
-        position={[TABLE_WIDTH / 2, 0.02, -TABLE_HEIGHT / 2 + 0.1]}
+        length={TABLE_WIDTH - 2 * FELT_OFFSET + 2 * CUSHION_BOTTOM_WIDTH}
+        position={[TABLE_WIDTH / 2 - FELT_OFFSET + CUSHION_BOTTOM_WIDTH, CUSHION_ELEVATION, -TABLE_HEIGHT / 2 + CUSHION_INNER_OFFSET]}
         rotation={[0, -Math.PI / 2, 0]}
       />
 
-      {/* Left (runs along +Z at -X edge, inner face toward +X) */}
+      {/* Left (runs +Z at -X edge, inner face toward +X, spans between outer edges of top/bottom cushions) */}
       <CushionRail
-        length={TABLE_HEIGHT}
-        position={[-TABLE_WIDTH / 2 + FELT_OFFSET - halfBottom + 0.02, 0.02, -TABLE_HEIGHT / 2]}
+        length={TABLE_HEIGHT - 2 * FELT_OFFSET + 2 * CUSHION_BOTTOM_WIDTH}
+        position={[-TABLE_WIDTH / 2 + CUSHION_INNER_OFFSET, CUSHION_ELEVATION, -TABLE_HEIGHT / 2 + FELT_OFFSET - CUSHION_BOTTOM_WIDTH]}
         rotation={[0, 0, 0]}
       />
 
-      {/* Right (runs along -Z at +X edge, inner face toward -X) */}
+      {/* Right (runs -Z at +X edge, inner face toward -X) */}
       <CushionRail
-        length={TABLE_HEIGHT}
-        position={[TABLE_WIDTH / 2 - FELT_OFFSET + halfBottom - 0.02, 0.02, TABLE_HEIGHT / 2]}
+        length={TABLE_HEIGHT - 2 * FELT_OFFSET + 2 * CUSHION_BOTTOM_WIDTH}
+        position={[TABLE_WIDTH / 2 - CUSHION_INNER_OFFSET, CUSHION_ELEVATION, TABLE_HEIGHT / 2 - FELT_OFFSET + CUSHION_BOTTOM_WIDTH]}
         rotation={[0, Math.PI, 0]}
       />
 
