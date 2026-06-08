@@ -12,11 +12,12 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 
 ## Architecture
 
-- `src/constants/index.ts` — presentation-only constants (`BALL_RADIUS`, `CUE_TIP_OFFSET`). Ball visual configs (`BallConfig` + `BALLS_CONFIG`) live in `balls-group.tsx`. **All global constants go here, never export from model files**
+- `src/constants/index.ts` — presentation & global constants (`BALL_RADIUS`, `CUE_TIP_OFFSET`, `CONTACT_RADIUS`). Re-exports `CUSHION_ANGLE`, `SIN_CUSHION`, `COS_CUSHION` from `physics/constants.ts`. Ball visual configs (`BallConfig` + `BALLS_CONFIG`) live in `balls-group.tsx`. **All global constants go here, never export from model files**
 - `src/stores/physics-store.ts` — zustand store bridging physics → presentation: `BallState` (position, velocity, angularVelocity) per ball (0=cue, 1–15=rack), plus `cuePosition`. Actions: `setBallState`, `setCuePosition`, `reset`
-- `src/physics/` — simulation engine (equations, collision detection, motion integration). Physics own constants live here, separate from presentation constants
+- `src/physics/` — simulation engine (equations, collision detection, motion integration). Physics own constants live in `src/physics/constants.ts` (defines `CUSHION_ANGLE`, trig values, `CUSHION_CONTACT_HEIGHT` — **source of truth** for cushion angle). Presentation/3D code imports directly from here when it needs the angle
 - `src/models/` — individual 3D components
 - `src/groups/` — composed scene objects
+- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, game-hud)
 - `src/app.tsx` — root: Canvas, lighting, scene assembly
 
 ## Scene layout
