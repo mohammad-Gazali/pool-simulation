@@ -15,7 +15,7 @@ export const GameHud = () => {
   const contactOffsetY = useCueControlStore(s => s.contactOffsetY)
   const setAimAngle = useCueControlStore(s => s.setAimAngle)
 
-  const strike = usePhysicsStore(s => s.strike)
+  const strikeCueBall = usePhysicsStore(s => s.strikeCueBall)
 
   const aimAngleRef = useRef(aimAngle)
 
@@ -25,8 +25,8 @@ export const GameHud = () => {
 
   const handleHit = useCallback(() => {
     const result = computeCueStrike(power, [contactOffsetX, contactOffsetY], aimAngle)
-    strike(0, result.velocity, result.angularVelocity)
-  }, [power, contactOffsetX, contactOffsetY, aimAngle, strike])
+    strikeCueBall(result.velocity, result.angularVelocity);
+  }, [power, contactOffsetX, contactOffsetY, aimAngle, strikeCueBall])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

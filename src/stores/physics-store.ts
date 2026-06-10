@@ -10,7 +10,7 @@ interface PhysicsState {
 interface PhysicsActions {
   setBallState: (id: number, state: Partial<BallState>) => void
   setCuePosition: (position: PhysicsState["cuePosition"]) => void
-  strike: (id: number, velocity: [number, number, number], angularVelocity: [number, number, number]) => void
+  strikeCueBall: (velocity: [number, number, number], angularVelocity: [number, number, number]) => void
   reset: () => void
 }
 
@@ -78,11 +78,11 @@ export const usePhysicsStore = create<PhysicsStore>((set) => ({
 
   setCuePosition: (position) => set({ cuePosition: position }),
 
-  strike: (id, velocity, angularVelocity) =>
+  strikeCueBall: (velocity, angularVelocity) =>
     set((prev) => ({
       balls: {
         ...prev.balls,
-        [id]: { ...prev.balls[id], velocity, angularVelocity },
+        0: { ...prev.balls[0], velocity, angularVelocity },
       },
     })),
 
