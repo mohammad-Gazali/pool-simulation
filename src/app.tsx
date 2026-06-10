@@ -40,7 +40,7 @@ export const App = () => {
             <meshStandardMaterial color="#111" />
           </mesh>
 
-          <BilliardTable />
+          <BilliardTable hidePockets />
           <BallsGroup />
           <CueControl />
           <PhysicsLoop />

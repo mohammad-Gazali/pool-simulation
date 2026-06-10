@@ -8,6 +8,8 @@ import { useCueControlStore } from "../stores/cue-control-store"
 
 const TWO_PI = 2 * Math.PI
 
+const VELOCITY_EPSILON = 0.005
+
 export const GameHud = () => {
   const power = useCueControlStore(s => s.power)
   const aimAngle = useCueControlStore(s => s.aimAngle)
@@ -16,6 +18,9 @@ export const GameHud = () => {
   const setAimAngle = useCueControlStore(s => s.setAimAngle)
 
   const strikeCueBall = usePhysicsStore(s => s.strikeCueBall)
+  const cueMoving = usePhysicsStore(
+    s => Math.sqrt(s.balls[0].velocity[0] ** 2 + s.balls[0].velocity[2] ** 2) > VELOCITY_EPSILON,
+  )
 
   const aimAngleRef = useRef(aimAngle)
 
@@ -56,7 +61,7 @@ export const GameHud = () => {
         <AimAngleSlider />
         <button
           className="w-full py-[10px] border-none rounded-lg text-sm font-bold tracking-[2px] uppercase cursor-pointer bg-[#cc3333] text-white transition-[background,opacity] duration-150 enabled:hover:bg-[#ee4444] disabled:opacity-30 disabled:cursor-not-allowed"
-          disabled={power <= 0}
+          disabled={power <= 0 || cueMoving}
           onClick={handleHit}
         >
           HIT

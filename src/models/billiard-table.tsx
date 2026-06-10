@@ -66,7 +66,7 @@ function Pocket({ x, z, radius }: { x: number; z: number; radius: number }) {
   )
 }
 
-export const BilliardTable = () => {
+export const BilliardTable = ({ hidePockets = false }: { hidePockets?: boolean }) => {
   return (
     <group position={[0, -0.5, 0]}>
       {/* Table Base */}
@@ -144,27 +144,29 @@ export const BilliardTable = () => {
         rotation={[0, Math.PI, 0]}
       />
 
-      {/* Corner pockets (inset from felt edge so they appear cut into the carpet) */}
-      {([-1, 1] as const).flatMap((sx) =>
-        ([-1, 1] as const).map((sz) => (
-          <Pocket
-            key={`c${sx}${sz}`}
-            x={sx * FELT_EDGE_X * POCKET_INSET + (sx * 0.04)}
-            z={sz * FELT_EDGE_Z * POCKET_INSET - (sz * 0.02)}
-            radius={0.11}
-          />
-        )),
-      )}
+      {!hidePockets && (<>
+        {/* Corner pockets (inset from felt edge so they appear cut into the carpet) */}
+        {([-1, 1] as const).flatMap((sx) =>
+          ([-1, 1] as const).map((sz) => (
+            <Pocket
+              key={`c${sx}${sz}`}
+              x={sx * FELT_EDGE_X * POCKET_INSET + (sx * 0.04)}
+              z={sz * FELT_EDGE_Z * POCKET_INSET - (sz * 0.02)}
+              radius={0.11}
+            />
+          )),
+        )}
 
-      {/* Side pockets along top/bottom edges (long sides, along table width) */}
-      {([-1, 1] as const).map((sz) => (
-        <Pocket
-          key={`s${sz}`}
-          x={0}
-          z={sz * FELT_EDGE_Z * POCKET_INSET - (sz * 0.01)}
-          radius={0.1}
-        />
-      ))}
+        {/* Side pockets along top/bottom edges (long sides, along table width) */}
+        {([-1, 1] as const).map((sz) => (
+          <Pocket
+            key={`s${sz}`}
+            x={0}
+            z={sz * FELT_EDGE_Z * POCKET_INSET - (sz * 0.01)}
+            radius={0.1}
+          />
+        ))}
+      </>)}
     </group>
   );
 };

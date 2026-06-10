@@ -67,6 +67,7 @@ export const CueControl = () => {
     const storedCuePos = usePhysicsStore.getState().cuePosition
 
     if (cueGroupRef.current) {
+      cueGroupRef.current.visible = !isMoving
       cueGroupRef.current.position.set(storedCuePos[0], storedCuePos[1], storedCuePos[2])
       cueGroupRef.current.rotation.y = -aimAngle
     }
