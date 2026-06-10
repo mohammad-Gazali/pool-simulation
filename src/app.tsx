@@ -1,23 +1,13 @@
-import { useState, Suspense } from "react"
+import { Suspense } from "react"
 import { Canvas } from "@react-three/fiber"
 import { Environment, OrbitControls } from "@react-three/drei"
 import { BilliardTable } from "./models/billiard-table"
 import { BallsGroup } from "./groups/balls-group"
 import { CueControl } from "./groups/cue-control"
 import { GameHud } from "./components/game-hud"
+import { PhysicsLoop } from "./physics/simulation"
 
 export const App = () => {
-  const [power, setPower] = useState(0.3)
-  const [contactOffset, setContactOffset] = useState<[number, number]>([0, 0])
-  const [aimAngle, setAimAngle] = useState(0)
-
-  const handleHit = () => {
-    void power
-    void contactOffset
-    void aimAngle
-    // TODO: trigger physics shot
-  }
-
   return (
     <main style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative" }}>
       <Canvas
@@ -52,7 +42,8 @@ export const App = () => {
 
           <BilliardTable />
           <BallsGroup />
-          <CueControl power={power} contactOffset={contactOffset} aimAngle={aimAngle} />
+          <CueControl />
+          <PhysicsLoop />
           <OrbitControls
             makeDefault
             minPolarAngle={0.2}
@@ -64,15 +55,7 @@ export const App = () => {
         </Suspense>
       </Canvas>
 
-      <GameHud
-        power={power}
-        contactOffset={contactOffset}
-        aimAngle={aimAngle}
-        onPowerChange={setPower}
-        onContactOffsetChange={setContactOffset}
-        onAimAngleChange={setAimAngle}
-        onHit={handleHit}
-      />
+      <GameHud />
     </main>
   )
 }

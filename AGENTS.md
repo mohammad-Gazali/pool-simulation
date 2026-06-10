@@ -12,13 +12,19 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 
 ## Architecture
 
-- `src/constants/index.ts` — presentation & global constants (`BALL_RADIUS`, `CUE_TIP_OFFSET`, `CONTACT_RADIUS`). Re-exports `CUSHION_ANGLE`, `SIN_CUSHION`, `COS_CUSHION` from `physics/constants.ts`. Ball visual configs (`BallConfig` + `BALLS_CONFIG`) live in `balls-group.tsx`. **All global constants go here, never export from model files**
-- `src/stores/physics-store.ts` — zustand store bridging physics → presentation: `BallState` (position, velocity, angularVelocity) per ball (0=cue, 1–15=rack), plus `cuePosition`. Actions: `setBallState`, `setCuePosition`, `reset`
-- `src/physics/` — simulation engine (equations, collision detection, motion integration). Physics own constants live in `src/physics/constants.ts` (defines `CUSHION_ANGLE`, trig values, `CUSHION_CONTACT_HEIGHT` — **source of truth** for cushion angle). Presentation/3D code imports directly from here when it needs the angle
+- `src/types/ball-state.ts` — shared `BallState` interface (`position`, `velocity`, `angularVelocity`, `config`) and `BallConfig` (`number`, `color`, `isStripe`)
+- `src/stores/physics-store.ts` — zustand store bridging physics → presentation: `Record<number, BallState>` (0=cue, 1–15=rack), `cuePosition`. Contains `BALLS_CONFIG` array + `buildInitialBalls()` for rack layout. Actions: `setBallState`, `setCuePosition`, `strike`, `reset`
+- `src/stores/cue-control-store.ts` — separate zustand store for cue UI state: `power`, `contactOffsetX/Y`, `aimAngle`. Actions: `setPower`, `setContactOffsetX/Y`, `setAimAngle`
+- `src/physics/` — simulation engine (equations, collision detection, motion integration).
+  - `constants.ts` — all physics constants (cushion angle/trig, ball mass/MOI, friction coefficients μ_r/μ_s/μ_spin, restitution e_tip, gravity, simulation thresholds). Contains PHYSICS.md real-world values (`PHYSICS_BALL_RADIUS=0.028575`, `BALL_MASS=0.17`) plus scene geometry (`SCENE_BALL_RADIUS=0.04`) and `PHYSICS_TO_SCENE`/`SCENE_TO_PHYSICS` conversion factors. `src/constants/index.ts` re-exports `SCENE_BALL_RADIUS as BALL_RADIUS` alongside cushion trig
+  - `cue-strike.ts` — `computeCueStrike()` implements the Section 6 J_n impulse formula: normal impulse from cue-ball contact, resulting linear and angular velocity
+  - `simulation.ts` — `PhysicsLoop` component (useFrame + fixed-timestep 120 Hz accumulator) runs `stepBall()` per ball: determines rest/spin/rolling-without-slip/rolling-with-slip state, applies appropriate friction forces, couples linear/angular velocity. Accesses zustand state via `store.getState()` to avoid hook subscription re-renders in the tick loop
 - `src/models/` — individual 3D components
-- `src/groups/` — composed scene objects
-- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, game-hud). GameHud controls are grouped in a single panel (semi-transparent box, right side of screen): ContactPicker (left) + PowerGauge (right) side-by-side, with a HIT button below. HIT button is disabled when `power <= 0`
-- `src/app.tsx` — root: Canvas, lighting, scene assembly, passes `onHit` callback to GameHud
+- `src/groups/` — composed scene objects.
+  - `CueControl` — takes no props, reads power/contactOffsets/aimAngle from `useCueControlStore`. Cue stick always visible, frozen at strike position when ball moves; aim line, contact ring, contact dot hidden while ball is moving
+  - `BallsGroup` — thin wrapper rendering `Ball` components from the store's `balls` record
+- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, game-hud). GameHud controls are grouped in a single panel (semi-transparent box, right side of screen): ContactPicker (left) + PowerGauge (right) side-by-side, with a HIT button below. HIT button is disabled when `power <= 0`. Keyboard aim (←/→, Shift for fine step) handled inside GameHud. GameHud takes no props, reads/writes `useCueControlStore`
+- `src/app.tsx` — root: Canvas, lighting, scene assembly. `<CueControl />` and `<GameHud />` take no props; contains `<PhysicsLoop>`
 
 ## Scene layout
 
@@ -26,7 +32,7 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 - Balls group at `y=-0.44`; cue ball at `[-1.0, BALL_RADIUS, 0]` local → `[-1.0, -0.40, 0]` world
 - Cue at `[-1.75, -0.40, 0]`, tip points +X toward cue ball with 0.02 gap at ball center height; built along local Y axis with rotation `[0, 0, -PI/2]`
 - Camera: `OrbitControls` with `minDistance={0.5}`, `maxDistance={5}`, polar angle clamped 0.2–π/2.2; zoom enabled
-- Cushions: right-trapezoid cross-section via `ExtrudeGeometry`, two 90° at outer face, 60° inner face (`CUSHION_ANGLE`). Each rail's inner edge bottom aligns with the felt boundary; rails extend to the adjacent cushion's outer edge so corners form a closed rectangle. Overlap per side = `CUSHION_BOTTOM_WIDTH = halfBottom + halfTop`.
+- Cushions: right-trapezoid cross-section via `ExtrudeGeometry`, two 90° at outer face, 60° inner face (`CUSHION_ANGLE`). Each rail's inner edge bottom aligns with the felt boundary; rails extend to the adjacent cushion's outer edge so corners form a closed rectangle. Overlap per side = `CUSHION_BOTTOM_WIDTH = halfBottom + halfTop`. `CUSHION_ANGLE` imported directly from `physics/constants.ts` (not re-export path)
 - Pockets: 4 corner + 2 side (along long edges), `cylinderGeometry` dark holes inset to 90% of felt edge. Corner radius 0.11, side radius 0.1, Y offset `+0.006` above surface to sit within carpet.
 
 ## Conventions

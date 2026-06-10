@@ -1,56 +1,64 @@
-import { useRef, useCallback, useEffect } from "react"
-import { CONTACT_RADIUS } from "../constants"
+import { useRef, useCallback, useEffect } from "react";
+import { CONTACT_RADIUS } from "../constants";
+import { useCueControlStore } from "../stores/cue-control-store";
 
-const PICKER_RADIUS = 50
+const PICKER_RADIUS = 50;
 
-interface ContactPickerProps {
-  offset: [number, number]
-  onChange: (offset: [number, number]) => void
-}
+export const ContactPicker = () => {
+  const contactOffsetX = useCueControlStore((s) => s.contactOffsetX);
+  const contactOffsetY = useCueControlStore((s) => s.contactOffsetY);
+  const setContactOffsetX = useCueControlStore((s) => s.setContactOffsetX);
+  const setContactOffsetY = useCueControlStore((s) => s.setContactOffsetY);
 
-export const ContactPicker = ({ offset, onChange }: ContactPickerProps) => {
-  const ref = useRef<HTMLDivElement>(null)
-  const draggingRef = useRef(false)
+  const ref = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
 
-  const toBallOffset = useCallback((clientX: number, clientY: number): [number, number] => {
-    const el = ref.current
-    if (!el) return [0, 0]
-    const rect = el.getBoundingClientRect()
-    const cx = rect.left + rect.width / 2
-    const cy = rect.top + rect.height / 2
-    const dx = (clientX - cx) / PICKER_RADIUS
-    const dy = (clientY - cy) / PICKER_RADIUS
-    const len = Math.sqrt(dx * dx + dy * dy)
-    const clamped = len > 1 ? [dx / len, dy / len] : [dx, dy]
-    return [clamped[0] * CONTACT_RADIUS, -clamped[1] * CONTACT_RADIUS]
-  }, [])
+  const toBallOffset = useCallback(
+    (clientX: number, clientY: number): [number, number] => {
+      const el = ref.current;
+      if (!el) return [0, 0];
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (clientX - cx) / PICKER_RADIUS;
+      const dy = (clientY - cy) / PICKER_RADIUS;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const clamped = len > 1 ? [dx / len, dy / len] : [dx, dy];
+      return [clamped[0] * CONTACT_RADIUS, -clamped[1] * CONTACT_RADIUS];
+    },
+    [],
+  );
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    draggingRef.current = true
-    onChange(toBallOffset(e.clientX, e.clientY))
-  }, [onChange, toBallOffset])
+  const handlePointerDown = (e: React.PointerEvent) => {
+    draggingRef.current = true;
+    const [x, y] = toBallOffset(e.clientX, e.clientY);
+    setContactOffsetX(x);
+    setContactOffsetY(y);
+  };
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
     if (draggingRef.current) {
-      onChange(toBallOffset(e.clientX, e.clientY))
+      const [x, y] = toBallOffset(e.clientX, e.clientY);
+      setContactOffsetX(x);
+      setContactOffsetY(y);
     }
-  }, [onChange, toBallOffset])
+  }, [toBallOffset, setContactOffsetX, setContactOffsetY]);
 
   const handlePointerUp = useCallback(() => {
-    draggingRef.current = false
-  }, [])
+    draggingRef.current = false;
+  }, []);
 
   useEffect(() => {
-    window.addEventListener("pointermove", handlePointerMove)
-    window.addEventListener("pointerup", handlePointerUp)
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
     return () => {
-      window.removeEventListener("pointermove", handlePointerMove)
-      window.removeEventListener("pointerup", handlePointerUp)
-    }
-  }, [handlePointerMove, handlePointerUp])
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [handlePointerMove, handlePointerUp]);
 
-  const dotX = PICKER_RADIUS * (offset[0] / CONTACT_RADIUS)
-  const dotY = -PICKER_RADIUS * (offset[1] / CONTACT_RADIUS)
+  const dotX = PICKER_RADIUS * (contactOffsetX / CONTACT_RADIUS);
+  const dotY = -PICKER_RADIUS * (contactOffsetY / CONTACT_RADIUS);
 
   return (
     <div className="contact-picker-wrapper">
@@ -73,5 +81,5 @@ export const ContactPicker = ({ offset, onChange }: ContactPickerProps) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};

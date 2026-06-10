@@ -1,19 +1,28 @@
 import { useMemo } from "react"
 import * as THREE from "three"
+import type { BallState } from "../types/ball-state"
+import { BALL_RADIUS } from "../constants"
 
-export interface BallConfig {
-  number: number
-  color: string
-  isStripe: boolean
+export const Ball = ({ state }: { state: BallState }) => {
+  const texture = useMemo(() => {
+    if (state.config.number === 0) return undefined
+    return createBallTexture(state.config)
+  }, [state])
+
+  return (
+    <mesh position={state.position} castShadow>
+      <sphereGeometry args={[BALL_RADIUS, 32, 32]} />
+      <meshStandardMaterial
+        map={texture}
+        roughness={0.25}
+        metalness={0.1}
+        envMapIntensity={0.5}
+      />
+    </mesh>
+  )
 }
 
-interface BallProps {
-  position: [number, number, number]
-  config: BallConfig
-  radius: number
-}
-
-const createBallTexture = (config: BallConfig) => {
+const createBallTexture = (config: BallState["config"]) => {
   const canvas = document.createElement("canvas")
   const size = 256
   canvas.width = size
@@ -47,23 +56,4 @@ const createBallTexture = (config: BallConfig) => {
   const texture = new THREE.CanvasTexture(canvas)
   texture.needsUpdate = true
   return texture
-}
-
-export const Ball = ({ position, config, radius }: BallProps) => {
-  const texture = useMemo(() => {
-    if (config.number === 0) return undefined
-    return createBallTexture(config)
-  }, [config])
-
-  return (
-    <mesh position={position} castShadow>
-      <sphereGeometry args={[radius, 32, 32]} />
-      <meshStandardMaterial
-        map={texture}
-        roughness={0.25}
-        metalness={0.1}
-        envMapIntensity={0.5}
-      />
-    </mesh>
-  )
 }

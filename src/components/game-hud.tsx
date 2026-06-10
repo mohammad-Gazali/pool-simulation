@@ -1,54 +1,53 @@
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { ContactPicker } from "./contact-picker"
 import { PowerGauge } from "./power-gauge"
+import { computeCueStrike } from "../physics/cue-strike"
+import { usePhysicsStore } from "../stores/physics-store"
+import { useCueControlStore } from "../stores/cue-control-store"
 
-interface GameHudProps {
-  power: number
-  contactOffset: [number, number]
-  aimAngle: number
-  onPowerChange: (power: number) => void
-  onContactOffsetChange: (offset: [number, number]) => void
-  onAimAngleChange: (angle: number) => void
-  onHit: () => void
-}
+export const GameHud = () => {
+  const power = useCueControlStore(s => s.power);
+  const aimAngle = useCueControlStore(s => s.aimAngle);
+  const contactOffsetX = useCueControlStore(s => s.contactOffsetX);
+  const contactOffsetY = useCueControlStore(s => s.contactOffsetY);
+  const setAimAngle = useCueControlStore(s => s.setAimAngle);
 
-export const GameHud = ({
-  power,
-  contactOffset,
-  aimAngle,
-  onPowerChange,
-  onContactOffsetChange,
-  onAimAngleChange,
-  onHit,
-}: GameHudProps) => {
-  const aimAngleRef = useRef(aimAngle)
-  aimAngleRef.current = aimAngle
+  const strike = usePhysicsStore(s => s.strike);
+
+  const aimAngleRef = useRef(aimAngle);
+
+  const handleHit = useCallback(() => {
+    const result = computeCueStrike(power, [contactOffsetX, contactOffsetY], aimAngle)
+    strike(0, result.velocity, result.angularVelocity)
+  }, [power, contactOffsetX, contactOffsetY, aimAngle, strike])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const step = e.shiftKey ? 0.01 : 0.05
       if (e.key === "ArrowLeft") {
-        onAimAngleChange(aimAngleRef.current + step)
+        aimAngleRef.current += step;
       } else if (e.key === "ArrowRight") {
-        onAimAngleChange(aimAngleRef.current - step)
+        aimAngleRef.current -= step;
       }
+
+      setAimAngle(aimAngleRef.current);
     }
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [onAimAngleChange])
+  }, [setAimAngle])
 
   return (
     <div className="ui-overlay">
       <div className="ui-controls">
         <div className="ui-controls-header">CONTROLS</div>
         <div className="ui-controls-body">
-          <ContactPicker offset={contactOffset} onChange={onContactOffsetChange} />
-          <PowerGauge power={power} onChange={onPowerChange} />
+          <ContactPicker />
+          <PowerGauge />
         </div>
         <button
           className="hit-button"
           disabled={power <= 0}
-          onClick={onHit}
+          onClick={handleHit}
         >
           HIT
         </button>

@@ -1,9 +1,9 @@
-interface PowerGaugeProps {
-  power: number
-  onChange: (power: number) => void
-}
+import { useCueControlStore } from "../stores/cue-control-store";
 
-export const PowerGauge = ({ power, onChange }: PowerGaugeProps) => {
+export const PowerGauge = () => {
+  const power = useCueControlStore((s) => s.power);
+  const setPower = useCueControlStore((s) => s.setPower);
+
   return (
     <div className="power-gauge-wrapper">
       <div className="power-label">POWER</div>
@@ -14,11 +14,11 @@ export const PowerGauge = ({ power, onChange }: PowerGaugeProps) => {
           max="1"
           step="0.01"
           value={power}
-          onChange={(e) => onChange(Number(e.target.value))}
+          onChange={(e) => setPower(Number(e.target.value))}
           className="power-slider"
         />
       </div>
       <div className="power-value">{Math.round(power * 100)}%</div>
     </div>
-  )
-}
+  );
+};

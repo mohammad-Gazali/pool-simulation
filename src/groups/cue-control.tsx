@@ -4,20 +4,25 @@ import * as THREE from "three"
 import { Cue } from "../models/cue"
 import { usePhysicsStore } from "../stores/physics-store"
 import { BALL_RADIUS, CUE_TIP_OFFSET, CONTACT_RADIUS } from "../constants"
+import { useCueControlStore } from "../stores/cue-control-store"
 
 const CUE_BALL_GAP = 0.02
 const AIM_LINE_LENGTH = 2
 const POWER_PULL_BACK = 0.15
+const VELOCITY_EPSILON = 0.005
 
-interface CueControlProps {
-  power: number
-  contactOffset: [number, number]
-  aimAngle: number
-}
-
-export const CueControl = ({ power, contactOffset, aimAngle }: CueControlProps) => {
+export const CueControl = () => {
   const ball = usePhysicsStore((s) => s.balls[0])
+  const storedCuePos = usePhysicsStore((s) => s.cuePosition)
   const setCuePosition = usePhysicsStore((s) => s.setCuePosition)
+  const power = useCueControlStore(s => s.power);
+  const contactOffsetX = useCueControlStore(s => s.contactOffsetX);
+  const contactOffsetY = useCueControlStore(s => s.contactOffsetY);
+  const aimAngle = useCueControlStore(s => s.aimAngle);
+
+  const moving = Math.sqrt(
+    ball.velocity[0] * ball.velocity[0] + ball.velocity[2] * ball.velocity[2],
+  ) > VELOCITY_EPSILON
 
   const aimDir = useMemo(
     () => new THREE.Vector3(Math.cos(aimAngle), 0, Math.sin(aimAngle)),
@@ -29,7 +34,7 @@ export const CueControl = ({ power, contactOffset, aimAngle }: CueControlProps) 
     [aimAngle],
   )
 
-  const [aRaw, bRaw] = contactOffset
+  const [aRaw, bRaw] = [contactOffsetX, contactOffsetY]
   const maxSq = CONTACT_RADIUS * CONTACT_RADIUS
   const [a, b] = (() => {
     const sq = aRaw * aRaw + bRaw * bRaw
@@ -52,8 +57,10 @@ export const CueControl = ({ power, contactOffset, aimAngle }: CueControlProps) 
   )
 
   useEffect(() => {
-    setCuePosition(cuePos)
-  }, [cuePos, setCuePosition])
+    if (!moving) {
+      setCuePosition(cuePos)
+    }
+  }, [cuePos, setCuePosition, moving])
 
   const contactPoint: [number, number, number] = useMemo(
     () => [
@@ -78,25 +85,29 @@ export const CueControl = ({ power, contactOffset, aimAngle }: CueControlProps) 
 
   return (
     <group position={[0, -0.44, 0]}>
-      <Line
-        points={linePoints}
-        color="#ffffff"
-        lineWidth={1}
-        transparent
-        opacity={0.15}
-      />
+      {!moving && (
+        <>
+          <Line
+            points={linePoints}
+            color="#ffffff"
+            lineWidth={1}
+            transparent
+            opacity={0.15}
+          />
 
-      <mesh position={[ball.position[0], ball.position[1], ball.position[2]]}>
-        <torusGeometry args={[CONTACT_RADIUS * 1.01, 0.002, 16, 32]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
-      </mesh>
+          <mesh position={[ball.position[0], ball.position[1], ball.position[2]]}>
+            <torusGeometry args={[CONTACT_RADIUS * 1.01, 0.002, 16, 32]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
+          </mesh>
 
-      <mesh position={contactPoint}>
-        <sphereGeometry args={[0.005, 8, 8]} />
-        <meshBasicMaterial color="#ff4444" />
-      </mesh>
+          <mesh position={contactPoint}>
+            <sphereGeometry args={[0.005, 8, 8]} />
+            <meshBasicMaterial color="#ff4444" />
+          </mesh>
+        </>
+      )}
 
-      <group position={cuePos} rotation={[0, -aimAngle, 0]}>
+      <group position={storedCuePos} rotation={[0, -aimAngle, 0]}>
         <Cue position={[0, 0, 0]} rotation={[0, 0, -Math.PI / 2]} />
       </group>
     </group>
