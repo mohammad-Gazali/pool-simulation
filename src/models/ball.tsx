@@ -1,16 +1,42 @@
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
+import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import type { BallState } from "../types/ball-state"
+import { usePhysicsStore } from "../stores/physics-store"
 import { BALL_RADIUS } from "../constants"
 
-export const Ball = ({ state }: { state: BallState }) => {
+interface BallProps {
+  id: number
+  config: {
+    number: number
+    color: string
+    isStripe: boolean
+  }
+}
+
+export const Ball = ({ id, config }: BallProps) => {
+  const meshRef = useRef<THREE.Mesh>(null)
+
   const texture = useMemo(() => {
-    if (state.config.number === 0) return undefined
-    return createBallTexture(state.config)
-  }, [state])
+    if (config.number === 0) return undefined
+    return createBallTexture(config)
+  }, [config])
+
+  useFrame((_, delta) => {
+    const state = usePhysicsStore.getState().balls[id]
+    if (!state) return
+    const mesh = meshRef.current
+    if (!mesh) return
+
+    mesh.position.set(state.position[0], state.position[1], state.position[2])
+
+    const [wx, wy, wz] = state.angularVelocity
+    mesh.rotation.x += wx * delta
+    mesh.rotation.y += wy * delta
+    mesh.rotation.z += wz * delta
+  })
 
   return (
-    <mesh position={state.position} castShadow>
+    <mesh ref={meshRef} position={[0, 0, 0]} castShadow>
       <sphereGeometry args={[BALL_RADIUS, 32, 32]} />
       <meshStandardMaterial
         map={texture}
@@ -22,7 +48,7 @@ export const Ball = ({ state }: { state: BallState }) => {
   )
 }
 
-const createBallTexture = (config: BallState["config"]) => {
+const createBallTexture = (config: { number: number; color: string; isStripe: boolean }) => {
   const canvas = document.createElement("canvas")
   const size = 256
   canvas.width = size
