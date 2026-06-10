@@ -23,7 +23,7 @@ Stack: React 19 + Vite 8 + TypeScript 6 + Three.js via `@react-three/fiber` + `@
 - `src/groups/` — composed scene objects.
   - `CueControl` — takes no props, reads power/contactOffsets/aimAngle from `useCueControlStore`. Cue stick always visible, frozen at strike position when ball moves; aim line, contact ring, contact dot hidden while ball is moving
   - `BallsGroup` — thin wrapper rendering `Ball` components from the store's `balls` record
-- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, game-hud). GameHud controls are grouped in a single panel (semi-transparent box, right side of screen): ContactPicker (left) + PowerGauge (right) side-by-side, with a HIT button below. HIT button is disabled when `power <= 0`. Keyboard aim (←/→, Shift for fine step) handled inside GameHud. GameHud takes no props, reads/writes `useCueControlStore`
+- `src/components/` — 2D React UI overlay components (contact-picker, power-gauge, aim-angle-slider, game-hud). GameHud controls are grouped in a single panel (semi-transparent box, right side of screen): ContactPicker (left) + PowerGauge (right) side-by-side, with an AimAngleSlider (horizontal, with degree readout) below, and a HIT button at the bottom. HIT button is disabled when `power <= 0`. Keyboard aim (←/→, Shift for fine step) handled inside GameHud. GameHud takes no props, reads/writes `useCueControlStore`. Uses `@radix-ui/react-slider` for all sliders.
 - `src/app.tsx` — root: Canvas, lighting, scene assembly. `<CueControl />` and `<GameHud />` take no props; contains `<PhysicsLoop>`
 
 ## Scene layout
