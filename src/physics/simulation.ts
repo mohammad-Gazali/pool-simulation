@@ -11,6 +11,7 @@ import {
   VELOCITY_THRESHOLD,
   OMEGA_THRESHOLD,
 } from "./constants"
+import { handleCushionCollisions } from "./cushion-collision"
 
 const MAX_DT = 1 / 30
 
@@ -85,11 +86,11 @@ function stepBall(ball: BallState, dt: number): Partial<BallState> | null {
       return null
     }
 
-    return {
+    return withCushionCheck({
       position: [ball.position[0] + vx * dt, ball.position[1], ball.position[2] + vz * dt],
-      velocity: [vx, 0, vz],
-      angularVelocity: [wx, wy, wz],
-    }
+      velocity: [vx, 0, vz] as [number, number, number],
+      angularVelocity: [wx, wy, wz] as [number, number, number],
+    })
   }
 
   // ─── Rolling with slipping (Section 3) ─────────────────────────────────
@@ -118,11 +119,18 @@ function stepBall(ball: BallState, dt: number): Partial<BallState> | null {
     return null
   }
 
-  return {
-    position: [ball.position[0] + vx * dt, ball.position[1], ball.position[2] + vz * dt],
-    velocity: [vx, 0, vz],
-    angularVelocity: [wx, wy, wz],
-  }
+  return withCushionCheck({
+    position: [ball.position[0] + vx * dt, ball.position[1], ball.position[2] + vz * dt] as [number, number, number],
+    velocity: [vx, 0, vz] as [number, number, number],
+    angularVelocity: [wx, wy, wz] as [number, number, number],
+  })
+}
+
+function withCushionCheck(result: Partial<BallState>): Partial<BallState> {
+  const hit = handleCushionCollisions(
+    result as { position: [number, number, number]; velocity: [number, number, number]; angularVelocity: [number, number, number] },
+  )
+  return hit ?? result
 }
 
 export const PhysicsLoop = () => {
