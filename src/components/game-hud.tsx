@@ -44,16 +44,18 @@ export const GameHud = () => {
   }, [setAimAngle])
 
   return (
-    <div className="ui-overlay">
-      <div className="ui-controls">
-        <div className="ui-controls-header">CONTROLS</div>
-        <div className="ui-controls-body">
+    <div className="absolute inset-0 pointer-events-none flex justify-end items-center p-6">
+      <div className="pointer-events-auto flex flex-col items-center gap-[18px] bg-black/60 border border-white/10 rounded-xl p-5 backdrop-blur">
+        <div className="text-[#666] text-[10px] font-semibold tracking-[2px] uppercase select-none">
+          CONTROLS
+        </div>
+        <div className="flex items-center gap-7">
           <ContactPicker />
           <PowerGauge />
         </div>
         <AimAngleSlider />
         <button
-          className="hit-button"
+          className="w-full py-[10px] border-none rounded-lg text-sm font-bold tracking-[2px] uppercase cursor-pointer bg-[#cc3333] text-white transition-[background,opacity] duration-150 enabled:hover:bg-[#ee4444] disabled:opacity-30 disabled:cursor-not-allowed"
           disabled={power <= 0}
           onClick={handleHit}
         >

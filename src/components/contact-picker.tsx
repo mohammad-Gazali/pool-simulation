@@ -61,19 +61,21 @@ export const ContactPicker = () => {
   const dotY = -PICKER_RADIUS * (contactOffsetY / CONTACT_RADIUS);
 
   return (
-    <div className="contact-picker-wrapper">
-      <div className="contact-picker-label">CONTACT</div>
+    <div className="flex flex-col items-center gap-2">
+      <div className="text-[#888] text-[10px] font-semibold tracking-[1.5px] uppercase select-none text-center">
+        CONTACT
+      </div>
       <div
         ref={ref}
-        className="contact-picker"
+        className="relative w-[100px] h-[100px] rounded-full bg-white/[0.06] border border-white/15 cursor-pointer group"
         onPointerDown={handlePointerDown}
         style={{ touchAction: "none" }}
       >
-        <div className="contact-boundary" />
-        <div className="contact-guide-v" />
-        <div className="contact-guide-h" />
+        <div className="absolute left-1/2 top-1/2 w-1/2 h-1/2 rounded-full border border-white/[0.08] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="absolute left-1/2 top-[10%] w-px h-4/5 -translate-x-1/2 bg-white/10" />
+        <div className="absolute top-1/2 left-[10%] h-px w-4/5 -translate-y-1/2 bg-white/10" />
         <div
-          className="contact-dot"
+          className="absolute w-3 h-3 rounded-full bg-[#ff4444] -translate-x-1/2 -translate-y-1/2 transition-[background] duration-150 shadow-[0_0_6px_rgba(255,68,68,0.5)] group-hover:bg-[#ff6666]"
           style={{
             left: `calc(50% + ${dotX}px)`,
             top: `calc(50% + ${dotY}px)`,

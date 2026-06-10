@@ -9,7 +9,7 @@ import { PhysicsLoop } from "./physics/simulation"
 
 export const App = () => {
   return (
-    <main style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative" }}>
+    <main className="w-screen h-screen overflow-hidden relative">
       <Canvas
         shadows
         camera={{ position: [3, 3, 3], fov: 45, near: 0.1, far: 50 }}
