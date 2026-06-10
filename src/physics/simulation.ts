@@ -43,14 +43,18 @@ function stepBall(ball: BallState, dt: number): Partial<BallState> | null {
   }
 
   // ─── Relative velocity at contact point (Section 3) ──────────────────────
-  // v_rel = v + ω × R·n̂   where n̂ = (0,1,0) upward normal
-  // ω × n̂ = (-ω_z, 0, ω_x)
   const relVx = vx + BALL_RADIUS * wz
   const relVz = vz - BALL_RADIUS * wx
   const relSpeed = Math.sqrt(relVx * relVx + relVz * relVz)
 
+  // ─── Stiction threshold ──────────────────────────────────────────────────
+  // Forward Euler can't resolve relative velocities below this value per step,
+  // creating a limit cycle. When relSpeed enters this band, force the no-slip
+  // condition and enter the rolling state.
+  const STICTION_BAND = (7 / 2) * MU_SLIDING * GRAVITY * dt
+
   // ─── Rolling without slipping (Section 3) ──────────────────────────────
-  if (relSpeed < VELOCITY_THRESHOLD) {
+  if (relSpeed < VELOCITY_THRESHOLD || relSpeed < STICTION_BAND) {
     const decel = MU_ROLLING * GRAVITY
     const dv = decel * dt
 
@@ -63,12 +67,10 @@ function stepBall(ball: BallState, dt: number): Partial<BallState> | null {
       const ratio = (speed - dv) / speed
       vx *= ratio
       vz *= ratio
-      // rolling constraint: v = R·ω × n̂  →  ω_x = -v_z/R,  ω_z = v_x/R
       wx = vz / BALL_RADIUS
       wz = -vx / BALL_RADIUS
     }
 
-    // ω_y spin decouples from rolling (Section 3)
     if (!noSpin) {
       const decel = MU_SPIN
       const newWy = wy - Math.sign(wy) * decel * dt
@@ -94,18 +96,14 @@ function stepBall(ball: BallState, dt: number): Partial<BallState> | null {
   const rvxHat = relVx / relSpeed
   const rvzHat = relVz / relSpeed
 
-  // linear: v̇ = -μ_s · g · v̂_rel
   const slipDecel = MU_SLIDING * GRAVITY
   vx -= slipDecel * rvxHat * dt
   vz -= slipDecel * rvzHat * dt
 
-  // angular: ω̇ = (5 · μ_s · g) / (2 · R) · (n̂ × v̂_rel)
-  // n̂ × v̂_rel = (rvzHat, 0, -rvxHat)
   const torqueFactor = (5 * MU_SLIDING * GRAVITY) / (2 * BALL_RADIUS)
   wx += torqueFactor * rvzHat * dt
   wz -= torqueFactor * rvxHat * dt
 
-  // ω_y spin decouples from sliding (Section 3)
   if (!noSpin) {
     const decel = MU_SPIN
     const newWy = wy - Math.sign(wy) * decel * dt

@@ -28,5 +28,5 @@ export const CUSHION_CONTACT_HEIGHT = BALL_RADIUS * (1 + SIN_CUSHION)
 
 // ─── Simulation thresholds ─────────────────────────────────────────────────
 export const VELOCITY_THRESHOLD = 0.001
-export const OMEGA_THRESHOLD = 0.01
+export const OMEGA_THRESHOLD = VELOCITY_THRESHOLD / BALL_RADIUS
 export const MAX_CUE_SPEED = 5
