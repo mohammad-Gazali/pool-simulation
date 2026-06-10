@@ -12,6 +12,7 @@ import {
   OMEGA_THRESHOLD,
 } from "./constants"
 import { handleCushionCollisions } from "./cushion-collision"
+import { handleBallCollisions } from "./ball-collision"
 
 const MAX_DT = 1 / 30
 
@@ -153,6 +154,22 @@ export const PhysicsLoop = () => {
         if (result) {
           anyMoving = true
           state.setBallState(id, result)
+        }
+      }
+
+      // ─── Ball-ball collision pass ──────────────────────────────────
+      const postStepBalls = store.getState().balls
+      const ballCollisions = handleBallCollisions(postStepBalls)
+      if (ballCollisions.size > 0) {
+        anyMoving = true
+        for (const [id, fix] of ballCollisions) {
+          const current = postStepBalls[id]
+          const cushioned = handleCushionCollisions({
+            position: fix.position ?? current.position,
+            velocity: fix.velocity ?? current.velocity,
+            angularVelocity: fix.angularVelocity ?? current.angularVelocity,
+          })
+          state.setBallState(id, cushioned ?? fix)
         }
       }
 
